@@ -48,17 +48,20 @@ const std::string TOPIC("#");
 const int	QOS = 1;
 const int	N_RETRY_ATTEMPTS = 5;
 
-nlohmann::json g_config = nlohmann::json::parse( std::ifstream("./config.json", std::ios::in ) );
+nlohmann::json g_config;
+
+struct SensorValueType_t;
 
 typedef struct
 {
 	int ID;
 	std::string name, topic;
+	std::vector<SensorValueType_t> sensorValueTypes;
 } Device_t;
 
 typedef struct SensorValueType_t
 {
-	int ID, deviceID;
+	int ID;
 	Device_t &device;
 	std::string name, topicRegex, jsonp;
 	
@@ -69,27 +72,24 @@ typedef struct
 {
 	int ID, valueTypeID;
 	SensorValueType_t &sensorValueType;
-	double value, timeStamp;
+	float value;
+	double timeStamp;
 } SensorValue_t;
 
 
 void from_json(const nlohmann::json& j, Device_t& p) {
-	j.at("ID").get_to(p.ID);
 	j.at("name").get_to(p.name);
 	j.at("topic").get_to(p.topic);
 }
 
 void from_json(const nlohmann::json& j, SensorValueType_t& p) {
-	j.at("ID").get_to(p.ID);
-	j.at("deviceID").get_to(p.deviceID);
 	j.at("name").get_to(p.name);
 	j.at("topicRegex").get_to(p.topicRegex);
 	j.at("jsonp").get_to(p.jsonp);
 }
 
 void to_json(nlohmann::json& j, const SensorValue_t& p) {
-        j = nlohmann::json
-        {
+        j = nlohmann::json{
         	{"valueTypeID", p.valueTypeID}, 
         	{"value", p.value}, 
         	{"time", p.timeStamp}
@@ -97,7 +97,6 @@ void to_json(nlohmann::json& j, const SensorValue_t& p) {
 }
 
 std::vector<Device_t> g_devices;
-std::vector<SensorValueType_t> g_sensorValueTypes;
 
 void CreateDevicesAndValueTypes()
 {
@@ -110,11 +109,35 @@ void CreateDevicesAndValueTypes()
 		g_devices.emplace_back( device );
 		for( auto valt: dev.value("valueTypes",nlohmann::json::array({}) ) )
 		{
-			SensorValueType_t sensorValueType(g_devices[g_devices.size()-1]);			
+			Device_t &insertedDevice = g_devices[g_devices.size()-1];
+			SensorValueType_t sensorValueType( insertedDevice );
 			from_json( valt, sensorValueType );			
 			// insert into SQLite DB
 			// set sensorValueType.ID
+			insertedDevice.sensorValueTypes.emplace_back( sensorValueType );
+			std::cerr << "Inserted " << device.name << "." << sensorValueType.name << std::endl;
 		}		
+	}
+}
+
+void ProcessIncomingData( std::string topic, nlohmann::json &j )
+{
+	for( auto d : g_devices )
+	{
+		if( d.topic == topic )
+		{
+			std::cerr << "Data from " << d.name << std::endl;
+			
+			for( auto vt: d.sensorValueTypes )
+			{
+				auto jp = nlohmann::json::json_pointer(vt.jsonp);
+				if( j.contains( jp ) )
+				{
+					std::cerr << vt.name << " is " << j.value(jp,-9999.9999) << std::endl;
+				}
+			}
+			break;
+		}
 	}
 }
 
@@ -230,6 +253,7 @@ class callback : public virtual mqtt::callback,
 		
 		try {
 			nlohmann::json j = nlohmann::json::parse( msg->to_string() );
+			ProcessIncomingData( msg->get_topic(), j );
 		}
 		catch (const std::exception& e) {
 			std::cerr << "***\tJSON processing failed!" << std::endl;
@@ -247,6 +271,9 @@ public:
 
 int main(int argc, char* argv[])
 {
+	g_config = nlohmann::json::parse( std::ifstream("./config.json", std::ios::in ) );
+	CreateDevicesAndValueTypes();
+
 	// A subscriber often wants the server to remember its messages when its
 	// disconnected. In that case, it needs a unique ClientID and a
 	// non-clean session.

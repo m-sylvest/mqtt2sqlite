@@ -1,2 +1,21 @@
-{ "ost":"havarti" 
+{ "devices":[
+	{"name":"Stue", "topic":"etrv/Stue/state", "valueTypes":[
+		{ "name":"Temperature","topicRegex":".*","jsonp":"/room_temp" }
+	]},
+	{"name":"Alrum","topic":"etrv/Alrum/state", "valueTypes":[
+		{ "name":"Temperature","topicRegex":".*","jsonp":"/room_temp" }
+	]},
+	{"name":"EvasKontor", "topic":"etrv/EvasKontor/state", "valueTypes":[
+		{ "name":"Temperature","topicRegex":".*","jsonp":"/room_temp" }
+	]},
+	{"name":"VejrStation","topic":"EvasWentus155", "valueTypes":[
+		{ "name":"Temperature","topicRegex":".*","jsonp":"/temperature_C" },
+		{ "name":"Humidity","topicRegex":".*","jsonp":"/humidity" },
+		{ "name":"Wind-avg","topicRegex":".*","jsonp":"/wind_avg_m_s" }
+	]},
+	{"name":"ShellyHT","topic":"shellyplusht-c049ef8ca8b8/events/rpc", "valueTypes":[
+		{ "name":"Temperature","topicRegex":".*","jsonp":"/temperature:0/tC" },
+		{ "name":"Humidity","topicRegex":".*","jsonp":"/humidity:0/rh" }
+	]}	
+  ]
 }

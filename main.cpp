@@ -50,6 +50,74 @@ const int	N_RETRY_ATTEMPTS = 5;
 
 nlohmann::json g_config = nlohmann::json::parse( std::ifstream("./config.json", std::ios::in ) );
 
+typedef struct
+{
+	int ID;
+	std::string name, topic;
+} Device_t;
+
+typedef struct SensorValueType_t
+{
+	int ID, deviceID;
+	Device_t &device;
+	std::string name, topicRegex, jsonp;
+	
+	SensorValueType_t( Device_t& dev ) : device( dev ) {};
+} SensorValueType_t;
+
+typedef struct
+{
+	int ID, valueTypeID;
+	SensorValueType_t &sensorValueType;
+	double value, timeStamp;
+} SensorValue_t;
+
+
+void from_json(const nlohmann::json& j, Device_t& p) {
+	j.at("ID").get_to(p.ID);
+	j.at("name").get_to(p.name);
+	j.at("topic").get_to(p.topic);
+}
+
+void from_json(const nlohmann::json& j, SensorValueType_t& p) {
+	j.at("ID").get_to(p.ID);
+	j.at("deviceID").get_to(p.deviceID);
+	j.at("name").get_to(p.name);
+	j.at("topicRegex").get_to(p.topicRegex);
+	j.at("jsonp").get_to(p.jsonp);
+}
+
+void to_json(nlohmann::json& j, const SensorValue_t& p) {
+        j = nlohmann::json
+        {
+        	{"valueTypeID", p.valueTypeID}, 
+        	{"value", p.value}, 
+        	{"time", p.timeStamp}
+        };
+}
+
+std::vector<Device_t> g_devices;
+std::vector<SensorValueType_t> g_sensorValueTypes;
+
+void CreateDevicesAndValueTypes()
+{
+	for( auto dev: g_config.value("devices",nlohmann::json::array({}) ) )
+	{
+		Device_t device;
+		from_json( dev, device );
+		// insert into SQLite DB
+		// set device.ID
+		g_devices.emplace_back( device );
+		for( auto valt: dev.value("valueTypes",nlohmann::json::array({}) ) )
+		{
+			SensorValueType_t sensorValueType(g_devices[g_devices.size()-1]);			
+			from_json( valt, sensorValueType );			
+			// insert into SQLite DB
+			// set sensorValueType.ID
+		}		
+	}
+}
+
 /////////////////////////////////////////////////////////////////////////////
 
 // Callbacks for the success or failures of requested actions.

@@ -1,21 +1,22 @@
 { "devices":[
-	{"name":"Stue", "topic":"etrv/Stue/state", "valueTypes":[
-		{ "name":"Temperature","topicRegex":".*","jsonp":"/room_temp" }
+	{ "ID":1, "name":"Stue", "topic":"etrv/Stue/state", "valueTypes":[
+		{ "ID":1, "name":"Temperature", "DeviceID":1, "unit":"C", "valueKey":"/payload/room_temp" }
 	]},
-	{"name":"Alrum","topic":"etrv/Alrum/state", "valueTypes":[
-		{ "name":"Temperature","topicRegex":".*","jsonp":"/room_temp" }
+	{ "ID":2, "name":"Alrum","topic":"etrv/Alrum/state", "valueTypes":[
+		{ "ID":2, "name":"Temperature", "DeviceID":2, "unit":"C", "valueKey":"/payload/room_temp" }
 	]},
-	{"name":"EvasKontor", "topic":"etrv/EvasKontor/state", "valueTypes":[
-		{ "name":"Temperature","topicRegex":".*","jsonp":"/room_temp" }
+	{ "ID":3, "name":"EvasKontor", "topic":"etrv/EvasKontor/state", "valueTypes":[
+		{ "ID":3, "name":"Temperature", "DeviceID":3, "unit":"C", "valueKey":"/payload/room_temp" }
 	]},
-	{"name":"VejrStation","topic":"EvasWentus155", "valueTypes":[
-		{ "name":"Temperature","topicRegex":".*","jsonp":"/temperature_C" },
-		{ "name":"Humidity","topicRegex":".*","jsonp":"/humidity" },
-		{ "name":"Wind-avg","topicRegex":".*","jsonp":"/wind_avg_m_s" }
+	{ "ID":4, "name":"VejrStation","topic":"EvasWentus155", "valueTypes":[
+		{ "ID":4, "name":"Temperature", "DeviceID":4, "unit":"C", "valueKey":"/payload/temperature_C", "matchKey":"/payload/model", "matchValue":"AlectoV1-Temperature" },
+		{ "ID":5, "name":"Humidity",    "DeviceID":4, "unit":"%", "valueKey":"/payload/humidity",      "matchKey":"/payload/model", "matchValue":"AlectoV1-Temperature" },
+		{ "ID":6, "name":"Wind-avg",    "DeviceID":4, "unit":"m/s", "valueKey":"/payload/wind_avg_m_s",  "matchKey":"/payload/model", "matchValue":"AlectoV1-Wind"         }
 	]},
-	{"name":"ShellyHT","topic":"shellyplusht-c049ef8ca8b8/events/rpc", "valueTypes":[
-		{ "name":"Temperature","topicRegex":".*","jsonp":"/temperature:0/tC" },
-		{ "name":"Humidity","topicRegex":".*","jsonp":"/humidity:0/rh" }
+	{ "ID":5, "name":"ShellyHT","topic":"shellyplusht-c049ef8ca8b8/events/rpc", "valueTypes":[
+		{ "ID":7, "name":"Temperature", "DeviceID":5, "unit":"C", "valueKey":"/payload/temperature:0/tC" },
+		{ "ID":8, "name":"Humidity",    "DeviceID":5, "unit":"%", "valueKey":"/payload/humidity:0/rh" }
 	]}	
   ]
 }
+

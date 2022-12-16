@@ -22,13 +22,10 @@ typedef struct MQTT2SQLite_stream_t
     json::json_pointer matchKey, valueKey;
     json matchValue;
     int valueTypeID = -1;
-    string deviceName, valueTypeName;
 
     MQTT2SQLite_stream_t(const json &deviceConfig, const json& valTypeConfig) {
         config      = valTypeConfig;
-        deviceName  = deviceConfig.value("name","xxx");
-        valueTypeName = valTypeConfig.value("name","yyy");
-        name        = deviceName + "." + valueTypeName;
+        name        = deviceConfig.value("name","xxx"); + "." + valTypeConfig.value("name","yyy");
         topic       = deviceConfig.value("topic","" );
         matchKey    = json::json_pointer( valTypeConfig.value("matchKey","" ) );
         matchValue  = valTypeConfig.value("matchValue", "" );

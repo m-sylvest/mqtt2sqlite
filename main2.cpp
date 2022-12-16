@@ -4,9 +4,22 @@
 #include <fstream>
 #include <functional>
 #include "nlohmann/json.hpp"
+#include "tiny-process-library/process.hpp"
 
 using namespace std;
 using namespace nlohmann;
+using namespace TinyProcessLib;
+
+void pruneJsonNulls( json &obj )
+{
+//  clog << "pruneJsonNulls: " << obj.dump() << endl;
+    for( auto& v : obj )
+        if( v.is_null()  )
+            v = "";
+//  clog << "pruneJsonNulls: " << obj.dump() << endl;
+}
+
+string g_c;
 
 typedef struct MQTT2SQLite_stream_t
 {
@@ -24,15 +37,19 @@ typedef struct MQTT2SQLite_stream_t
     int valueTypeID = -1;
 
     MQTT2SQLite_stream_t(const json &deviceConfig, const json& valTypeConfig) {
+
+    //  clog << "MQTT2SQLite_stream_t() d-enter: " << deviceConfig.dump() << endl;
+    //  clog << "MQTT2SQLite_stream_t() v-enter: " << valTypeConfig.dump() << endl;
+
         config      = valTypeConfig;
         name        = deviceConfig.value("name","xxx"); + "." + valTypeConfig.value("name","yyy");
         topic       = deviceConfig.value("topic","" );
         matchKey    = json::json_pointer( valTypeConfig.value("matchKey","" ) );
-        matchValue  = valTypeConfig.value("matchValue", "" );
+        matchValue  = valTypeConfig.value("matchValue", json{} );
         valueKey    = json::json_pointer( valTypeConfig.value("valueKey","" ) );
         valueTypeID = valTypeConfig.value("ID", -2 );
 
-        clog << "MQTT2SQLite_stream_t(): " << name << endl;
+    //  clog << "MQTT2SQLite_stream_t() exit: " << name << endl;
     };
 
 } MQTT2SQLite_stream_t;
@@ -72,21 +89,48 @@ vector<MQTT2SQLite_stream_t>  makeStreams( json config )
 {
     vector<MQTT2SQLite_stream_t> result;
 
-    for( auto dev : config.value("devices",json::array_t{}) )
+    json devicesConfig;
+    Process process1a("sqlite3 devices.sqlite '.mode json' 'select * from Devices'", "", [&devicesConfig](const char *bytes, size_t n) {
+    //  clog << "Output from sqlite3 stdout: " << string(bytes, n) << endl;
+        devicesConfig = json::parse( string(bytes, n) );
+    //  clog << "devicesConfig: " << devicesConfig.dump() << endl;
+    });
+    process1a.get_exit_status();
+
+    json valueTypesConfig;
+    Process process1b("sqlite3 devices.sqlite '.mode json' 'select * from ValueTypes'", "", [&valueTypesConfig](const char *bytes, size_t n) {
+    //  clog << "Output from sqlite3 stdout: " << string(bytes, n) << endl;
+        valueTypesConfig = json::parse( string(bytes, n) );
+    //  clog << "valueTypesConfig: " << valueTypesConfig.dump() << endl;
+    });
+    process1b.get_exit_status();
+
+//  clog << "P1: " << endl;
+    for( auto& dev : devicesConfig )
     {
-        for( auto valt: dev.value("valueTypes",json::array_t{}) )
+        pruneJsonNulls( dev );
+    //  clog << "P2: " << dev.dump() << endl;
+        for( auto& valt: valueTypesConfig )
         {
-            MQTT2SQLite_stream_t entry(dev,valt);
+            if( dev.value("ID",-1) == valt.value("DeviceID",-2) )
+            {
+            //  clog << "P3: " << valt.dump() << endl;
+                pruneJsonNulls( valt );
+            //  clog << "P4: " << valt.dump() << endl;
 
-            auto filter_it = filters.find(entry.name);
-            auto filter_func = (filter_it != filters.end()) ? filter_it->second : filterByJSONP;
-            entry.filter = filter_func;
+            //  clog.flush();
+                MQTT2SQLite_stream_t entry(dev,valt);
 
-            auto converter_it = converters.find(entry.name);
-            auto converter_func = (converter_it != converters.end()) ? converter_it->second : generateFromJSONP;
-            entry.converter = converter_func;
+                auto filter_it = filters.find(entry.name);
+                auto filter_func = (filter_it != filters.end()) ? filter_it->second : filterByJSONP;
+                entry.filter = filter_func;
 
-            result.push_back(entry);
+                auto converter_it = converters.find(entry.name);
+                auto converter_func = (converter_it != converters.end()) ? converter_it->second : generateFromJSONP;
+                entry.converter = converter_func;
+
+                result.push_back(entry);
+            }
         } 
     }
     return result;

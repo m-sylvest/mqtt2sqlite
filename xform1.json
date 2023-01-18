@@ -1,0 +1,50 @@
+[
+	{ "sourceName":"ShellyHT",
+	  "mqttFilter":"c049ef8ca8b8",
+	  "mqttReplace":[{"from":"temperature:0","to":"temperature_0"},{"from":"humidity:0","to":"humidity_0"},{"from":"devicepower:0","to":"devicepower_0"}],
+	  "mqttSample":{"tst":"2023-01-09T17:27:57.156286Z+0100","topic":"shellyplusht-c049ef8ca8b8/events/rpc","qos":0,"retain":0,"payloadlen":720,"payload":{"src":"shellyplusht-c049ef8ca8b8","dst":"shellyplusht-c049ef8ca8b8/events","method":"NotifyFullStatus","params":{"ts":1673281681.09,"ble":{},"cloud":{"connected":false},"devicepower_0":{"id":0,"battery":{"V":5.8,"percent":91},"external":{"present":false}},"ht_ui":{},"humidity_0":{"id":0,"rh":46.8},"mqtt":{"connected":true},"sys":{"mac":"C049EF8CA8B8","restart_required":false,"time":null,"unixtime":null,"uptime":2,"ram_size":254928,"ram_free":155844,"fs_size":458752,"fs_free":196608,"cfg_rev":4,"available_updates":{},"wakeup_reason":{"boot":"deepsleep_wake","cause":"periodic"}},"temperature_0":{"id":0,"tC":18.1,"tF":64.6},"wifi":{"sta_ip":"192.168.1.197","status":"got ip","ssid":"Zyxel_C670","rssi":-48}}}}
+,
+	  "values":[
+		{ "name":"Temperature", "unit":"\u2103", "jsonp":"/payload/params/temperature_0.tC" },
+		{ "name":"Humidity",    "unit":"%",  "jsonp":"/payload/params/humidity_0.rh" },
+		{ "name":"BatteryVolt", "unit":"V",  "jsonp":"/payload/params/devicepower_0/battery/V" }
+	  ]
+	},
+	{ "sourceName":"RadiatorAlrum",
+	  "mqttSample":{"tst":"2023-01-09T17:35:12.306505Z+0100","topic":"etrv/Alrum/state","qos":0,"retain":0,"payloadlen":121,"payload":{"name":"Alrum","battery":69,"room_temp":19,"set_point":19,"last_update":"2023-01-09T16:35:12.232760+00:00"}}
+,
+	  "values":[
+		{ "name":"Temperature",  "unit":"\u2103", "jsonp":"/payload/room_temp" },
+		{ "name":"TempSetPoint", "unit":"\u2103", "jsonp":"/payload/set_point" },
+		{ "name":"BatteryPct",   "unit":"%",  "jsonp":"/payload/battery" }
+	  ]
+	},
+	{ "sourceName":"RadiatorStue",
+	  "mqttSample":{"tst":"2023-01-09T22:42:50.251479Z+0100","topic":"etrv/Stue/state","qos":0,"retain":0,"payloadlen":120,"payload":{"name":"Stue","battery":69,"room_temp":13,"set_point":11,"last_update":"2023-01-09T21:42:50.217346+00:00"}}
+,
+	  "values":[
+		{ "name":"Temperature",  "unit":"\u2103", "jsonp":"/payload/room_temp" },
+		{ "name":"TempSetPoint", "unit":"\u2103", "jsonp":"/payload/set_point" },
+		{ "name":"BatteryPct",   "unit":"%",  "jsonp":"/payload/battery" }
+	  ]
+	},
+	{ "sourceName":"RadiatorEva",
+	  "mqttSample":{"tst":"2023-01-09T22:43:24.728125Z+0100","topic":"etrv/EvasKontor/state","qos":0,"retain":0,"payloadlen":126,"payload":{"name":"EvasKontor","battery":71,"room_temp":18.5,"set_point":17,"last_update":"2023-01-09T21:43:24.698066+00:00"}}
+,
+	  "values":[
+		{ "name":"Temperature",  "unit":"\u2103", "jsonp":"/payload/room_temp" },
+		{ "name":"TempSetPoint", "unit":"\u2103", "jsonp":"/payload/set_point" },
+		{ "name":"BatteryPct",   "unit":"%",  "jsonp":"/payload/battery" }
+	  ]
+	},
+	{ "sourceName":"UdeTermometer",
+	  "mqttFilter":",\"id\":230,",
+	  "mqttSample":{"tst":"2023-01-09T22:48:37.877283Z+0100","topic":"EvasWentus155","qos":0,"retain":0,"payloadlen":174,"payload":{"time":"2023-01-09 22:48:36","model":"AlectoV1-Temperature","id":230,"channel":1,"battery_ok":1,"temperature_C":12.9,"humidity":58,"mic":"CHECKSUM"}}
+,
+	  "values":[
+		{ "name":"Temperature", "unit":"\u2103", "jsonp":"/payload/temperature_C" },
+		{ "name":"Humidity",    "unit":"%",  "jsonp":"/payload/humidity" },
+		{ "name":"BatteryOK",   "unit":"",   "jsonp":"/payload/battery_ok" }
+	  ]
+	}
+]

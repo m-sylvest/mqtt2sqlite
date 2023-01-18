@@ -15,10 +15,10 @@ typedef struct MQTT2SQLite_Source_t
     MQTT2SQLite_Source_t(const json &c) {
 
         clog << "MQTT2SQLite_Source_t() enter: " << c.dump() << endl;
-        config      = c;
+        config = c;
     };
 
-    bool   mqttFilter(  string line ) { 
+    bool mqttFilter(  string line ) { 
         string filter = config.value( "mqttFilter","" );
         return filter == "" || line.find( filter ) != string::npos;
     };
@@ -53,7 +53,20 @@ typedef struct MQTT2SQLite_Source_t
         return config["mqttSample"]["topic"] == j["topic"];
     };
 
-    json columnOutput( json j ) { return json{}; };
+    json columnOutput( json j ) 
+    {
+        json::object_t result{{ "tst", j["tst"] }}; 
+
+        for( const auto col: config["values"] ) 
+        {
+            json::json_pointer jp( col["jsonp"] );
+            if( j.contains(jp) )
+            {
+                result[ col["name"] ] = j.at(jp);
+            }
+        }
+        return result;
+    };
 
 } MQTT2SQLite_Source_t;
 
@@ -89,15 +102,19 @@ void processInputLine( string line )
                     if( s.mqttMatchTopic(parsed))
                     {
                         clog << "Matched  :" << replaced << endl;
+                        json colData = s.columnOutput( parsed );
+                        clog << endl;
+                        clog << "Col.output  :" << colData << endl;
+                        cout << colData.dump() << endl;
                     }
                 }
             }
         }
         catch (json::exception e) {
-            clog << "Exception: " << e.what() << endl;
+            clog << "JSON Exception: " << e.what() << endl;
         }
         catch (std::exception e) {
-            clog << "Exception: " << e.what() << endl;
+            clog << "STD Exception: " << e.what() << endl;
         }
     }
 }
@@ -116,7 +133,6 @@ void runSampleTests()
 int main( int argc, char * argv[] )
 {
 	g_config = json::parse( ifstream("./xform1.json" ) );
-    clog << "Config: " << g_config << endl;
     g_sources = makeStreams();
 
     runSampleTests();

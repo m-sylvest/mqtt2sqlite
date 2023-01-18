@@ -5,8 +5,8 @@
 	  "mqttSample":{"tst":"2023-01-09T17:27:57.156286Z+0100","topic":"shellyplusht-c049ef8ca8b8/events/rpc","qos":0,"retain":0,"payloadlen":720,"payload":{"src":"shellyplusht-c049ef8ca8b8","dst":"shellyplusht-c049ef8ca8b8/events","method":"NotifyFullStatus","params":{"ts":1673281681.09,"ble":{},"cloud":{"connected":false},"devicepower_0":{"id":0,"battery":{"V":5.8,"percent":91},"external":{"present":false}},"ht_ui":{},"humidity_0":{"id":0,"rh":46.8},"mqtt":{"connected":true},"sys":{"mac":"C049EF8CA8B8","restart_required":false,"time":null,"unixtime":null,"uptime":2,"ram_size":254928,"ram_free":155844,"fs_size":458752,"fs_free":196608,"cfg_rev":4,"available_updates":{},"wakeup_reason":{"boot":"deepsleep_wake","cause":"periodic"}},"temperature_0":{"id":0,"tC":18.1,"tF":64.6},"wifi":{"sta_ip":"192.168.1.197","status":"got ip","ssid":"Zyxel_C670","rssi":-48}}}}
 ,
 	  "values":[
-		{ "name":"Temperature", "unit":"\u2103", "jsonp":"/payload/params/temperature_0.tC" },
-		{ "name":"Humidity",    "unit":"%",  "jsonp":"/payload/params/humidity_0.rh" },
+		{ "name":"Temperature", "unit":"\u2103", "jsonp":"/payload/params/temperature_0/tC" },
+		{ "name":"Humidity",    "unit":"%",  "jsonp":"/payload/params/humidity_0/rh" },
 		{ "name":"BatteryVolt", "unit":"V",  "jsonp":"/payload/params/devicepower_0/battery/V" }
 	  ]
 	},
